@@ -88,7 +88,6 @@ body {
 .task-input::placeholder {
   font-size: 15px;
   font-weight: 400;
-  text-align: ;
 }
 input:focus {
   outline: none;
