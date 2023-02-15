@@ -1,41 +1,27 @@
-const activeTasks = [
-  "clean room",
-  "play guitar",
-  "do homework",
-  "go to the gym",
-  "go to the bank",
-  "clean room",
-  "play guitar",
-  "do homework",
-  "go to the gym",
-  "go to the bank",
-];
+const activeTasksArr = [];
+const activeTasksSet = new Set(activeTasksArr);
+const activeTasks = new Array(...activeTasksSet);
 const completedTasks = [];
 const items = document.querySelector(".items");
 const cross = document.querySelector(".cross");
 const itemsCompleted = document.querySelector(".items-completed");
 
-activeTasks.forEach(function (current, i) {
-  const html = `<div class="item" id=${i}>
-<div class="dot"></div>
-<p>${current}</p>
-<div class="bin"><i class="fa fa-trash" aria-hidden="true"></i></div>
-</div>`;
-  items.insertAdjacentHTML("beforeend", html);
-});
-
 // Add items
 cross.addEventListener("click", function () {
   const newTask = document.querySelector(".task-input").value;
-  activeTasks.push(newTask);
-  const html = `<div class="item">
+  if (newTask) {
+    activeTasks.push(newTask);
+    console.log(activeTasks);
+    const html = `<div class="item" id = ${activeTasks.length}>
   <div class="dot"></div>
   <p>${newTask}</p>
   <div class="bin"><i class="fa fa-trash" aria-hidden="true"></i></div>
   </div>`;
-  const newItem = items.insertAdjacentHTML("beforeend", html);
-
-  addNewItem();
+    const newItem = items.insertAdjacentHTML("beforeend", html);
+    addNewItem();
+    updateHeader();
+    document.querySelector(".task-input").value = "";
+  }
 });
 const updateUI = function (finishedTask, del) {
   if (!del) {
@@ -77,23 +63,35 @@ binFunc();
 // Finished task
 function addNewItem() {
   const dot = document.querySelectorAll(".dot");
+
   const listen = dot.forEach((current, i) => {
+    current.removeEventListener("click", addNewItem);
     current.addEventListener("click", function () {
-      const clickedTask = activeTasks.indexOf(i);
-      activeTasks.splice(clickedTask, 1);
-      completedTasks.push(current.parentElement.children[1].innerHTML);
-      updateUI(current);
-      binFunc();
-      updateHeader();
+      const clickedTask = activeTasks.indexOf(
+        current.parentElement.children[1].innerHTML
+      );
+
+      if (clickedTask !== -1) {
+        const task = activeTasks.splice(clickedTask, 1);
+        completedTasks.push(current.parentElement.children[1].innerHTML);
+        updateUI(current);
+        binFunc();
+        updateHeader();
+      }
     });
   });
 }
-addNewItem();
+
 document.querySelector(".btn-search").addEventListener("click", function () {
   const input = document.querySelector(".search-input").value;
   activeTasks.filter((cur, i) => {
     if (cur === input.toLowerCase()) {
-      const as = document.getElementById(`${i}`).classList.add("selected");
+      console.log(cur);
+      console.log(i);
+      console.log(input.toLowerCase());
+
+      const as = document.getElementById(`${i + 1}`).classList.add("selected");
+      document.querySelector(".search-input").value = "";
     }
   });
 
@@ -102,6 +100,7 @@ document.querySelector(".btn-search").addEventListener("click", function () {
       const as = document
         .getElementById(`${i}-completed`)
         .classList.add("selected");
+      document.querySelector(".search-input").value = "";
     }
   });
 });
@@ -117,3 +116,12 @@ const updateHeader = function () {
   })`;
 };
 updateHeader();
+
+const removeMarker = function () {
+  document.querySelectorAll(".items").forEach((cur, i) => {
+    cur.addEventListener("click", function (e) {
+      const as = e.target.classList.remove("selected");
+    });
+  });
+};
+removeMarker();
